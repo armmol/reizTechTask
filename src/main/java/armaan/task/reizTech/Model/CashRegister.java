@@ -1,5 +1,6 @@
 package armaan.task.reizTech.Model;
 
+import javax.naming.NameAlreadyBoundException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -18,16 +19,22 @@ public class CashRegister {
         return cashRegisterMap;
     }
 
-    public void addNewDenomination(Double denomination, int quantity) {
-        cashRegisterMap.put(denomination, quantity);
+    public void setCashRegisterMap(Map<Double, Integer> cashRegisterMap) {
+        this.cashRegisterMap = cashRegisterMap;
     }
 
-    public void removeFromCashRegister(Double denomination, int quantity) {
-        cashRegisterMap.put(denomination, cashRegisterMap.get(denomination) - quantity);
+    public void addNewDenomination(Double denomination, int quantity) throws NameAlreadyBoundException {
+        if (cashRegisterMap.get(denomination) == null)
+            cashRegisterMap.put(denomination, quantity);
+        else
+            throw new NameAlreadyBoundException(denomination+" Denomination already present in Cash Inventory.");
     }
 
-    public void addToCashRegister(Double denomination, int quantity) {
-        cashRegisterMap.replace(denomination, cashRegisterMap.get(denomination) + quantity);
+    public void removeDenomination(Double denomination) throws NullPointerException {
+        if (cashRegisterMap.get(denomination) != null)
+            cashRegisterMap.remove(denomination);
+        else
+            throw new NullPointerException(denomination+" Denomination not present in Cash Inventory.");
     }
 
     public void increaseCashDenominationQuantity(double denomination, int quantity) throws NullPointerException {
@@ -35,26 +42,26 @@ public class CashRegister {
         if (denominationList.size() != 0)
             cashRegisterMap.replace(denomination, cashRegisterMap.get(denomination) + quantity);
         else
-            throw new NullPointerException(denomination + " Denomination not present in Cash Register. Try adding as new type.\n");
+            throw new NullPointerException(denomination + " Denomination not present in Cash Inventory. Try adding as new type.\n");
     }
 
     public void decreaseCashDenominationQuantity(double denomination, int quantity) throws NullPointerException {
         List<Double> denominationList = cashRegisterMap.keySet().stream().filter(d -> d == denomination).collect(Collectors.toList());
         if (denominationList.size() != 0) {
-            if (cashRegisterMap.get(denominationList.get(0)) > quantity)
+            if (cashRegisterMap.get(denomination) >= quantity)
                 cashRegisterMap.replace(denomination, cashRegisterMap.get(denomination) - quantity);
             else
                 throw new NullPointerException(denomination + " Denomination quantity("
-                        + cashRegisterMap.get(denominationList.get(0)) + ") is less that decrease amount\n");
+                        + cashRegisterMap.get(denomination) + ") is less than decrease amount\n");
         } else
-            throw new NullPointerException(denomination + " Denomination not present in Cash Register. Try adding as new type.\n");
+            throw new NullPointerException(denomination + " Denomination not present in Cash Inventory. Try adding as new type.\n");
     }
 
     @Override
     public String toString() {
         Stream<Double> stream = cashRegisterMap.keySet().stream();
         AtomicReference<String> returnString = new AtomicReference<>("");
-        stream.forEach(denomination ->
+        stream.sorted().forEach(denomination ->
                 returnString.set(returnString.get() + "\n" +
                         "Value: " + denomination + ", Quantity: " + cashRegisterMap.get(denomination)));
         return returnString.get();
