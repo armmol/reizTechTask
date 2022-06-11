@@ -93,6 +93,7 @@ public class SupermarketServiceImpl implements SupermarketService {
             if (input.equals("CANCEL")) {
                 if (!denominationsProvided.isEmpty()) {
                     Map<Double, Integer> returnMoney = new HashMap<>();
+                    printSeparator();
                     System.out.println("Here is the money you provided initially.");
                     denominationsProvided.stream().sorted().forEach(denomination -> returnMoney.putIfAbsent(denomination, 0));
                     denominationsProvided.stream().sorted().forEach(denomination ->
@@ -221,7 +222,7 @@ public class SupermarketServiceImpl implements SupermarketService {
                     denominationsProvided.add(amount);
                     denominationsProvided.forEach(denomination ->
                             cashRegister.increaseCashDenominationQuantity(denomination, 1));
-                    System.out.printf("You have provided %s. Here is your product.\n", totalAmountProvided);
+                    System.out.printf("You have provided %s. Here is your product. %s\n", totalAmountProvided, productDesired);
                     totalAmountProvided = 0;
                     updateProductInventoryAfterSale(productDesired);
                     updateCashRegister();
@@ -230,9 +231,9 @@ public class SupermarketServiceImpl implements SupermarketService {
                     try {
                         denominationsProvided.add(amount);
                         calculateChange(totalAmountProvided, price);
-                        System.out.printf("You have provided %s. Your change is %s. Here is your product.\n"
+                        System.out.printf("You have provided %s. Your change is %s. Here is your product. %s\n"
                                 , totalAmountProvided, new BigDecimal(totalAmountProvided - total)
-                                        .setScale(2, RoundingMode.HALF_DOWN).doubleValue());
+                                        .setScale(2, RoundingMode.HALF_DOWN).doubleValue(), productDesired);
                         totalAmountProvided = 0;
                         updateProductInventoryAfterSale(productDesired);
                         updateCashRegister();
@@ -528,6 +529,8 @@ public class SupermarketServiceImpl implements SupermarketService {
             throw new NotEnoughChangeException("Insufficient change to complete transaction, Provide another bill or exact change.");
         } else {
             cashRegister.setCashRegisterMap(cashRegisterMapCopy);
+            printSeparator();
+            System.out.println("Change");
             result.keySet().forEach(
                     denomination -> System.out.printf("Value: %s, Quantity: %s\n", denomination, result.get(denomination)));
         }

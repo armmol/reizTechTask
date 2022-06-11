@@ -2,6 +2,7 @@ package armaan.task.reizTech.Model;
 
 import javax.naming.NameAlreadyBoundException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -29,7 +30,7 @@ public class ProductStorage {
 
     public void removeProduct(String productName) throws NullPointerException {
         List<Product> productList = productsMap.keySet()
-                .stream().filter(p -> p.getName().equals(productName)).collect(Collectors.toList());
+                .stream().filter(p -> p.getName().equals(productName.toUpperCase(Locale.ROOT))).collect(Collectors.toList());
 
         if (productList.size() != 0)
             if (productsMap.get(productList.get(0)) != null)
@@ -42,13 +43,13 @@ public class ProductStorage {
 
     public void updateProductAfterSale(String productName) {
         Stream<Product> productStream = productsMap.keySet().stream();
-        Product product = productStream.filter(product1 -> product1.getName().equals(productName)).collect(Collectors.toList()).get(0);
+        Product product = productStream.filter(product1 -> product1.getName().equals(productName.toUpperCase(Locale.ROOT))).collect(Collectors.toList()).get(0);
         productsMap.replace(product, productsMap.get(product) - 1);
     }
 
     public void increaseProductQuantity(String productName, int quantity) throws NullPointerException {
         Stream<Product> productStream = productsMap.keySet().stream();
-        List<Product> product = productStream.filter(product1 -> product1.getName().equals(productName)).collect(Collectors.toList());
+        List<Product> product = productStream.filter(product1 -> product1.getName().equals(productName.toUpperCase(Locale.ROOT))).collect(Collectors.toList());
         if (product.size() != 0)
             productsMap.replace(product.get(0), productsMap.get(product.get(0)) + quantity);
         else
@@ -57,7 +58,7 @@ public class ProductStorage {
 
     public void decreaseProductQuantity(String productName, int quantity) throws NullPointerException {
         Stream<Product> productStream = productsMap.keySet().stream();
-        List<Product> product = productStream.filter(product1 -> product1.getName().equals(productName)).collect(Collectors.toList());
+        List<Product> product = productStream.filter(product1 -> product1.getName().equals(productName.toUpperCase(Locale.ROOT))).collect(Collectors.toList());
         if (product.size() != 0) {
             if (productsMap.get(product.get(0)) >= quantity)
                 productsMap.replace(product.get(0), productsMap.get(product.get(0)) - quantity);
